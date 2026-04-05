@@ -56,3 +56,10 @@ uvicorn main:app --reload
 **Alonso Sixto Silva Vidal**  
 Data Analyst & BI Engineer  
 [LinkedIn](https://www.linkedin.com/in/alonso-sixto-silva) · [Portafolio](https://alonso769.github.io/PORTAFOLIO/)
+
+## 🌐 Demo en vivo
+👉 **[datapulse-indol.vercel.app](https://datapulse-indol.vercel.app)**
+
+**Credenciales demo:**
+- Email: `admin@datapulse.com`
+- Password: `admin123`
