@@ -13,18 +13,19 @@ export default function Login() {
   e.preventDefault()
   setLoading(true)
   setError('')
-  
-  // Demo mode — sin backend por ahora
-  await new Promise(r => setTimeout(r, 1000))
-  
-  if (email === 'admin@datapulse.com' && password === 'admin123') {
-    localStorage.setItem('token', 'demo-token-123')
-    localStorage.setItem('user', JSON.stringify({ name: 'Alonso Sixto' }))
+  try {
+    const res = await axios.post('http://localhost:8000/auth/login', {
+      email,
+      password
+    })
+    localStorage.setItem('token', res.data.token)
+    localStorage.setItem('user', JSON.stringify(res.data.user))
     navigate('/')
-  } else {
-    setError('Credenciales incorrectas. Usa las del Demo.')
+  } catch (err) {
+    setError('Credenciales incorrectas. Intenta nuevamente.')
+  } finally {
+    setLoading(false)
   }
-  setLoading(false)
 }
 
   return (
