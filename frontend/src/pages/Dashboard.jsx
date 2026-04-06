@@ -5,14 +5,14 @@ import { Upload, FileText, LogOut, TrendingUp, Users, Activity, AlertTriangle } 
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
-const mockKPIs = [
+const defaultKPIs = [
   { label: 'Camas Ocupadas', value: '847', unit: '/1200', trend: '+5%', color: 'blue', icon: Activity },
   { label: 'Pacientes Atendidos', value: '1,234', unit: 'hoy', trend: '+12%', color: 'green', icon: Users },
   { label: 'Tiempo Promedio', value: '28', unit: 'min', trend: '-8%', color: 'yellow', icon: TrendingUp },
   { label: 'Alertas Activas', value: '3', unit: 'críticas', trend: '+1', color: 'red', icon: AlertTriangle },
 ]
 
-const mockLine = [
+const defaultLine = [
   { mes: 'Ene', pacientes: 980 },
   { mes: 'Feb', pacientes: 1100 },
   { mes: 'Mar', pacientes: 1050 },
@@ -21,7 +21,7 @@ const mockLine = [
   { mes: 'Jun', pacientes: 1320 },
 ]
 
-const mockBar = [
+const defaultBar = [
   { area: 'Emergencia', atenciones: 420 },
   { area: 'Consulta', atenciones: 380 },
   { area: 'UCI', atenciones: 95 },
@@ -39,16 +39,58 @@ const mockPie = [
 export default function Dashboard() {
   const navigate = useNavigate()
   const [user, setUser] = useState({ name: 'Administrador' })
+  const [kpis, setKpis] = useState(defaultKPIs)
+  const [barData, setBarData] = useState(defaultBar)
+  const [lineData, setLineData] = useState(defaultLine)
+  const [csvLoaded, setCsvLoaded] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('user')
     if (stored) setUser(JSON.parse(stored))
+
+    // Cargar datos del CSV si existe
+    const dashData = localStorage.getItem('dashboardData')
+    if (dashData) {
+      const parsed = JSON.parse(dashData)
+
+      if (parsed.chart_data?.length > 0) {
+        setBarData(parsed.chart_data)
+      }
+
+      if (parsed.line_data?.length > 0) {
+        setLineData(parsed.line_data.map(d => ({
+          mes: d.mes,
+          pacientes: d.pacientes
+        })))
+      }
+
+      if (parsed.summary?.kpis) {
+        const k = parsed.summary.kpis
+        setKpis([
+          { label: 'Camas Ocupadas', value: k.promedio_camas?.toString() || '847', unit: '/1200', trend: '+5%', color: 'blue', icon: Activity },
+          { label: 'Pacientes Atendidos', value: k.total_pacientes?.toLocaleString() || '1,234', unit: 'total', trend: '+12%', color: 'green', icon: Users },
+          { label: 'Tiempo Promedio', value: k.tiempo_promedio?.toString() || '28', unit: 'min', trend: '-8%', color: 'yellow', icon: TrendingUp },
+          { label: 'Alertas Activas', value: '3', unit: 'críticas', trend: '+1', color: 'red', icon: AlertTriangle },
+        ])
+      }
+
+      setCsvLoaded(true)
+    }
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('dashboardData')
     navigate('/login')
+  }
+
+  const handleClearData = () => {
+    localStorage.removeItem('dashboardData')
+    setKpis(defaultKPIs)
+    setBarData(defaultBar)
+    setLineData(defaultLine)
+    setCsvLoaded(false)
   }
 
   return (
@@ -62,8 +104,18 @@ export default function Dashboard() {
           </div>
           <span className="font-bold text-gray-800 text-lg">DataPulse</span>
           <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">Salud</span>
+          {csvLoaded && (
+            <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+              ✅ Datos CSV cargados
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-4">
+          {csvLoaded && (
+            <button onClick={handleClearData} className="text-xs text-gray-400 hover:text-red-500 transition-colors">
+              Limpiar datos
+            </button>
+          )}
           <button onClick={() => navigate('/upload')} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             <Upload size={16} /> Subir datos
           </button>
@@ -87,12 +139,14 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Dashboard General</h1>
-          <p className="text-gray-500 text-sm mt-1">Indicadores en tiempo real — Actualizado hace 5 min</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {csvLoaded ? '✅ Mostrando datos de tu archivo CSV' : 'Indicadores en tiempo real — Actualizado hace 5 min'}
+          </p>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {mockKPIs.map((kpi, i) => {
+          {kpis.map((kpi, i) => {
             const Icon = kpi.icon
             const colors = {
               blue: 'bg-blue-50 text-blue-600',
@@ -125,7 +179,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-800 mb-4">Pacientes atendidos — 2024</h3>
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={mockLine}>
+              <LineChart data={lineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
@@ -139,7 +193,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-800 mb-4">Atenciones por área</h3>
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={mockBar}>
+              <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="area" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 12 }} />

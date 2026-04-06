@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import { Upload, FileSpreadsheet, CheckCircle, ArrowLeft, X } from 'lucide-react'
 
 export default function UploadPage() {
@@ -31,14 +32,25 @@ export default function UploadPage() {
     handleFile(e.dataTransfer.files[0])
   }
 
-  const handleUpload = async () => {
-    if (!file) return
-    setUploading(true)
-    // Simula subida — aquí conectarás con FastAPI
-    await new Promise(r => setTimeout(r, 2000))
-    setUploading(false)
+ const handleUpload = async () => {
+  if (!file) return
+  setUploading(true)
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await axios.post('http://localhost:8000/upload/csv', formData)
+
+    localStorage.setItem('dashboardData', JSON.stringify(res.data))
     setSuccess(true)
+  } catch (err) {
+    console.error('Error completo:', err)
+    console.error('Response:', err.response?.data)
+    alert(`Error: ${err.response?.data?.detail || err.message}`)
+  } finally {
+    setUploading(false)
   }
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
