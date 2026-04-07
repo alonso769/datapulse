@@ -7,7 +7,7 @@
 
 ## 📊 ¿Qué es DataPulse?
 
-SaaS de análisis de datos para hospitales y clínicas. Permite subir archivos CSV/Excel y genera automáticamente dashboards interactivos con KPIs, alertas y reportes PDF.
+DataPulse es una solución SaaS (Software as a Service) diseñada para digitalizar y automatizar el análisis de indicadores operacionales en instituciones de salud. La plataforma permite transformar archivos CSV o Excel en dashboards interactivos con KPIs críticos en tiempo real.Este proyecto surge de la experiencia directa en la DIRIS Lima Centro y el Hospital Santa Rosa, atendiendo la necesidad crítica de herramientas modernas de visualización para la gestión hospitalaria.
 
 ## ✨ Funcionalidades
 
@@ -16,7 +16,7 @@ SaaS de análisis de datos para hospitales y clínicas. Permite subir archivos C
 - 🔔 Alertas automáticas por umbrales críticos
 - 📄 Generación de reportes PDF
 - 👥 Autenticación con roles (admin, analista)
-- 🗄️ Base de datos PostgreSQL
+- ☁️ Persistencia en la Nube
 
 ## 🛠️ Stack tecnológico
 
@@ -25,7 +25,7 @@ SaaS de análisis de datos para hospitales y clínicas. Permite subir archivos C
 | Frontend | React + Vite + TailwindCSS |
 | Gráficos | Recharts |
 | Backend | Python + FastAPI |
-| Base de datos | PostgreSQL |
+| Base de datos | Azure SQL / PostgreSQL |
 | Auth | JWT |
 | Deploy | Vercel + Render |
 
@@ -61,5 +61,5 @@ Data Analyst & BI Engineer
 👉 **[datapulse-indol.vercel.app](https://datapulse-indol.vercel.app)**
 
 **Credenciales demo:**
-- Email: `admin@datapulse.com`
-- Password: `admin123`
+- Email: `asilva@datapulse.com`
+- Password: `ClaveSegura2026*`
