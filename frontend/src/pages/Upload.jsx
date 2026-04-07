@@ -133,15 +133,22 @@ export default function UploadPage() {
               </div>
             )}
 
-            {/* Formato esperado */}
-            <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
-              <p className="text-xs font-semibold text-blue-700 mb-2">Columnas esperadas en tu archivo:</p>
-              <div className="flex flex-wrap gap-2">
-                {['fecha', 'area', 'pacientes', 'camas_ocupadas', 'tiempo_atencion', 'estado'].map(col => (
-                  <span key={col} className="text-xs bg-white text-blue-600 border border-blue-200 px-2 py-1 rounded font-mono">{col}</span>
-                ))}
-              </div>
-            </div>
+            {/* Formato Inteligente */}
+<div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
+  <p className="text-xs font-semibold text-blue-700 mb-2">
+    ✨ Mapeo inteligente activado:
+  </p>
+  <p className="text-[10px] text-blue-600 mb-2">
+    Puedes usar nombres como "Atenciones", "Servicio" o "Fecha" y el sistema los reconocerá automáticamente.
+  </p>
+  <div className="flex flex-wrap gap-2">
+    {['fecha', 'area', 'pacientes', 'camas', 'tiempo'].map(col => (
+      <span key={col} className="text-[10px] bg-white text-blue-600 border border-blue-200 px-2 py-1 rounded font-mono">
+        {col}
+      </span>
+    ))}
+  </div>
+</div>
 
             <button
               onClick={handleUpload}

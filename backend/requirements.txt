@@ -1,3 +1,5 @@
+pyodbc
+sqlalchemy
 fastapi
 uvicorn
 pandas

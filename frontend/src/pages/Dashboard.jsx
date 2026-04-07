@@ -44,39 +44,66 @@ export default function Dashboard() {
   const [lineData, setLineData] = useState(defaultLine)
   const [csvLoaded, setCsvLoaded] = useState(false)
 
-  useEffect(() => {
-    const stored = localStorage.getItem('user')
-    if (stored) setUser(JSON.parse(stored))
+ useEffect(() => {
+  const stored = localStorage.getItem('user');
+  if (stored) setUser(JSON.parse(stored));
 
-    // Cargar datos del CSV si existe
-    const dashData = localStorage.getItem('dashboardData')
-    if (dashData) {
-      const parsed = JSON.parse(dashData)
+  const dashData = localStorage.getItem('dashboardData');
+  if (dashData) {
+    const parsed = JSON.parse(dashData);
 
-      if (parsed.chart_data?.length > 0) {
-        setBarData(parsed.chart_data)
-      }
-
-      if (parsed.line_data?.length > 0) {
-        setLineData(parsed.line_data.map(d => ({
-          mes: d.mes,
-          pacientes: d.pacientes
-        })))
-      }
-
-      if (parsed.summary?.kpis) {
-        const k = parsed.summary.kpis
-        setKpis([
-          { label: 'Camas Ocupadas', value: k.promedio_camas?.toString() || '847', unit: '/1200', trend: '+5%', color: 'blue', icon: Activity },
-          { label: 'Pacientes Atendidos', value: k.total_pacientes?.toLocaleString() || '1,234', unit: 'total', trend: '+12%', color: 'green', icon: Users },
-          { label: 'Tiempo Promedio', value: k.tiempo_promedio?.toString() || '28', unit: 'min', trend: '-8%', color: 'yellow', icon: TrendingUp },
-          { label: 'Alertas Activas', value: '3', unit: 'críticas', trend: '+1', color: 'red', icon: AlertTriangle },
-        ])
-      }
-
-      setCsvLoaded(true)
+    // 1. Datos para el gráfico de barras (ya viene como 'area' y 'atenciones')
+    if (parsed.chart_data?.length > 0) {
+      setBarData(parsed.chart_data);
     }
-  }, [])
+
+    // 2. Datos para el gráfico de líneas (ya viene como 'mes' y 'pacientes')
+    if (parsed.line_data?.length > 0) {
+      setLineData(parsed.line_data);
+    }
+
+    // 3. Mapeo inteligente de los 4 cuadros de arriba (KPIs)
+    if (parsed.summary?.kpis) {
+      const k = parsed.summary.kpis;
+      setKpis([
+        { 
+          label: 'Camas Ocupadas', 
+          value: k.promedio_camas?.toFixed(1) || '0', 
+          unit: 'promedio', 
+          trend: 'Dato real', 
+          color: 'blue', 
+          icon: Activity 
+        },
+        { 
+          label: 'Pacientes Atendidos', 
+          value: k.total_pacientes?.toLocaleString() || '0', 
+          unit: 'total', 
+          trend: '+12%', 
+          color: 'green', 
+          icon: Users 
+        },
+        { 
+          label: 'Tiempo Promedio', 
+          value: k.tiempo_promedio?.toString() || '0', 
+          unit: 'min', 
+          trend: 'Dato real', 
+          color: 'yellow', 
+          icon: TrendingUp 
+        },
+        { 
+          label: 'Alertas Activas', 
+          value: k.max_camas?.toString() || '0', 
+          unit: 'pico camas', 
+          trend: 'Máximo', 
+          color: 'red', 
+          icon: AlertTriangle 
+        },
+      ]);
+    }
+
+    setCsvLoaded(true);
+  }
+}, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token')
